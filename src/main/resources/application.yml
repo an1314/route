@@ -27,6 +27,7 @@ server:
     max-threads: 800
     # Tomcat启动初始化的线程数，默认值25
     min-spare-threads: 30
+    max-connections: 0
 
 
 # 日志配置
@@ -86,7 +87,7 @@ token:
 # MyBatis配置
 mybatis:
     # 搜索指定包别名
-    typeAliasesPackage: com.srp.project.**.domain
+    typeAliasesPackage: com.srp.project.**.domain,com.srp.project.**.entity
     # 配置mapper的扫描，找到所有的mapper.xml映射文件
     mapperLocations: classpath*:mybatis/**/*Mapper.xml
     # 加载全局的配置文件

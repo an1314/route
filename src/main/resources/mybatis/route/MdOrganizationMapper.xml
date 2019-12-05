@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.organization.mapper.MdOrganizationMapper">
+
+	<resultMap type="MdOrganization" id="MdOrganizationResult">
+		<id     property="orgId"      column="OrgID"     />
+		<result property="orgCode"    column="OrgCode"   />
+		<result property="orgNameCn"  column="OrgNameCN"   />
+		<result property="orgNameEn"  column="OrgNameEN"   />
+		<result property="orgLevel"   column="OrgLevel"   />
+		<result property="orgType"    column="OrgType"      />
+		<result property="parent"     column="Parent"       />
+		<result property="fullPath"   column="FullPath"       />
+		<result property="buCode"     column="BuCode"      />
+		<result property="isDeleted"  column="IsDeleted"    />
+		<result property="cityTier"   column="CityTier" />
+		<result property="createBy"   column="CreateBy"   />
+		<result property="createTime" column="CreateTime" />
+		<result property="updateBy"   column="LastModifiedBy"   />
+		<result property="updateTime" column="LastModifiedTime" />
+	</resultMap>
+	
+	<sql id="selectOrganizationVo">
+        select o.OrgID, o.OrgCode, o.OrgNameCN, o.OrgNameEN, o.OrgLevel, o.OrgType, o.Parent, o.FullPath, o.BuCode, o.IsDeleted, o.CreateBy, o.CreateTime 
+        from MD_Organization o
+    </sql>
+    
+	<select id="selectMdOrganizationList" parameterType="MdOrganization" resultMap="MdOrganizationResult">
+        <include refid="selectOrganizationVo"/>
+        where o.IsDeleted = '0'
+        <if test="parent != null and parent != 0">
+			AND Parent = #{parent}
+		</if>
+		<if test="orgNameCn != null and orgNameCn != ''">
+			AND OrgNameCN like concat('%', #{orgNameCn}, '%')
+		</if>
+		<!-- 数据范围过滤 -->
+		<!-- ${dataScope} -->
+		order by o.parent
+    </select>
+    
+</mapper> 
