@@ -6,23 +6,37 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - SRPApplication",
+            "request": "launch",
+            "mainClass": "com.srp.SRPApplication",
+            "projectName": "ruoyi"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - SRPApplication",
+            "request": "launch",
+            "mainClass": "com.srp.SRPApplication",
+            "projectName": "srp"
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-RuoYiApplication<ruoyi>",
+            "name": "Debug (Launch)-SRPApplication<srp>",
             "request": "launch",
-            "mainClass": "com.ruoyi.RuoYiApplication",
-            "projectName": "ruoyi"
+            "mainClass": "com.srp.SRPApplication",
+            "projectName": "srp"
         },
         {
             "type": "java",
-            "name": "Debug (Launch)-EscapeUtil<ruoyi>",
+            "name": "Debug (Launch)-EscapeUtil<srp>",
             "request": "launch",
-            "mainClass": "com.ruoyi.common.utils.html.EscapeUtil",
-            "projectName": "ruoyi"
+            "mainClass": "com.srp.common.utils.html.EscapeUtil",
+            "projectName": "srp"
         }
     ]
 }
