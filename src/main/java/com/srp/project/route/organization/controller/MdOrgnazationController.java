@@ -30,7 +30,7 @@ public class MdOrgnazationController extends BaseController{
     public AjaxResult list(MdOrganization mdOrganization)
     {
         List<MdOrganization> mdOrganizations = mdOrganizationService.selectOrganizationList(mdOrganization);
-        return AjaxResult.success(mdOrganizationService.buildOrganizationTree(mdOrganizations));
+        return AjaxResult.success(mdOrganizations);
     }
 
 

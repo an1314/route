@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.user.mapper.SfaUsersMapper">
+
+	<resultMap type="SfaUsers" id="SfaUsersResult">
+        <id column="Code" property="code"  />
+        <result column="Password" property="password"  />
+        <result column="FirstName" property="firstName"  />
+        <result column="LastName" property="lastName"  />
+        <result column="Longitude" property="longitude"  />
+        <result column="Latitude" property="latitude" />
+        <result column="GroupId" property="groupid"  />
+        <result column="OrgCode" property="orgCode" />
+        <result column="Valid" property="valid" />
+        <result column="createBy" property="createuser" />
+        <result column="createTime" property="createtime" />
+        <result column="updateBy" property="lastupdateuser"  />
+        <result column="updateTime" property="lastupdatetime"  />
+	</resultMap>
+	
+	<sql id="selectUsersDictVo">
+        select u.Code, u.FirstName, u.LastName
+        from sfa_users u
+    </sql>
+    
+	<select id="selectSfaUsersDictList" parameterType="SfaUsers" resultType="SfaUsersForDist">
+        <include refid="selectUsersDictVo"/>
+        where 
+        valid = '1' 
+        AND position in ('门店负责人',  '流动理货员')
+        AND u.orgCode in
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        <if test="name != null and name != ''">
+			AND concat(FirstName, LastName) like concat('%', #{name}, '%')
+		</if>
+    </select>    
+</mapper> 

@@ -29,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
 	<select id="selectMdOrganizationList" parameterType="MdOrganization" resultMap="MdOrganizationResult">
         <include refid="selectOrganizationVo"/>
-        where o.IsDeleted = '0'
+        where o.IsDeleted = '0' AND o.buCode = '8'
         <if test="parent != null and parent != 0">
 			AND Parent = #{parent}
 		</if>
@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		<!-- 数据范围过滤 -->
 		<!-- ${dataScope} -->
-		order by o.parent
+		order by o.OrgLevel asc, o.Parent asc, o.orgID asc
     </select>
     
 </mapper> 
