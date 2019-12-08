@@ -5,6 +5,8 @@ import java.util.List;
 import com.srp.project.route.store.entity.SfaStore;
 import com.srp.project.route.store.entity.SfaStoreForOrg;
 
+import org.apache.ibatis.annotations.Param;
+
 /**
  * SfaStoreMapper
  */
@@ -37,5 +39,5 @@ public interface SfaStoreMapper {
      * @param sfaStore
      * @return
      */
-    public Integer delete(List<String> storeCodes, String createBy);
+    public Integer delete(@Param("storeCodes") List<String> storeCodes, @Param("updateBy") String updateBy, @Param("storeStatus") boolean storeStatus);
 }

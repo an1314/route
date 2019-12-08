@@ -37,5 +37,5 @@ public interface SfaStoreService {
      * @param sfaStore
      * @return
      */
-    public Integer delete(List<String> storeCodes, String createBy);
+    public Integer delete(List<String> storeCodes, String updateBy, boolean storeStatus);
 }

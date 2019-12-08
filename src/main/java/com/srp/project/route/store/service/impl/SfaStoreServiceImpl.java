@@ -57,8 +57,8 @@ public class SfaStoreServiceImpl implements SfaStoreService {
      * @return
      */
     @Override
-    public Integer delete(List<String> storeCodes, String createBy){
-        return sfaStoreMapper.delete(storeCodes, createBy);
+    public Integer delete(List<String> storeCodes, String updateBy, boolean storeStatus){
+        return sfaStoreMapper.delete(storeCodes, updateBy, storeStatus);
     }
 
     

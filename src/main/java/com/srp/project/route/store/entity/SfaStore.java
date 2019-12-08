@@ -27,6 +27,8 @@ public class SfaStore extends BaseEntity{
 
     private Double longitude;
 
+    private String orgCode;
+
     private List<String> orgCodes;
 
     private List<String> storeTypes;
@@ -116,6 +118,14 @@ public class SfaStore extends BaseEntity{
 
     public void setStoreTypes(List<String> storeTypes) {
         this.storeTypes = storeTypes;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
     

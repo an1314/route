@@ -86,9 +86,10 @@ public class SfaStoreController extends BaseController {
         return AjaxResult.success(sfaStoreService.update(sfaStore));
     }
 
-    @DeleteMapping("/delete/{createBy}/{storeCodes}")
-    public AjaxResult delete(@PathVariable("createBy") String createBy, @PathVariable("storeCodes") List<String> storeCodes){
-        return AjaxResult.success(sfaStoreService.delete(storeCodes, SecurityUtils.getUsername()));
+    // 删除门店信息
+    @DeleteMapping("/delete/{storeCodes}")
+    public AjaxResult delete(@PathVariable("storeCodes") List<String> storeCodes){
+        return AjaxResult.success(sfaStoreService.delete(storeCodes, SecurityUtils.getUsername(), false));
     }
     
 }
