@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.routecustomer.mapper.SfaRouteCustomerMapper">
+    <resultMap type="SfaRouteCustomer" id="SfaRouteCustomerResult">
+        <result column="UserCode" property="userCode"  />
+        <result column="UserFirstName" property="userFirstName"  />
+        <result column="UserLastName" property="userLastName"  />
+        <collection property="stores"  javaType="java.util.List" resultMap="com.srp.project.route.store.mapper.SfaStoreMapper.SfaStoreForConnectionResult" />
+    </resultMap>
+    <!-- 查询用户覆盖 -->
+    <select id="selectSfaRouteCustomerList" parameterType="SfaRouteCustomer" resultMap="SfaRouteCustomerResult">
+        Select 
+        u.code as userCode, u.firstName as userFirstName, u.lastName as userLastName,
+        s.storeCode as storeCode, s.storeName as storeName, s.longitude as longitude, s.latitude as latitude,
+        s.storeAddress as storeAddress, s.storeType as storeType,
+        rap.date as lastVisitTime
+        from (
+        select distinct userCode, storeCode from sfa_route_customer src
+           where src.valid = '1'
+        
+        <if test="userCodes != null and userCodes.size() != 0">
+            and
+            src.userCode
+            in
+        
+                
+                
+            
+            <foreach collection="userCodes" item="uc" open="(" close=")" separator=",">
+                #{uc}
+            </foreach>
+        </if>
+        ) rc
+        left join
+        sfa_store s on rc.storeCode = s.storeCode
+        left join
+        sfa_users u on rc.userCode = u.code
+        <!-- 获取最后拜访时间 -->
+        left join
+        
+            
+            
+            
+        
+        
+        (select ra.userCode, ra.storeCode, max(ra.date) as date
+            from sfa_route_act ra
+            where 
+            ra.valid = '1'
+            
+            
+            
+        
+        <if test="userCodes != null and userCodes.size() != 0">
+            and
+            ra.userCode
+            in
+            
+                
+                
+                
+            
+            <foreach collection="userCodes" item="uc" open="(" close=")" separator=",">
+                #{uc}
+            </foreach>
+        </if>
+            group by userCode, storeCode
+        ) rap on rc.userCode = rap.userCode and rc.storeCode = rap.storeCode 
+        where
+        s.storeStatus = '1'    
+    
+    </select>
+</mapper> 

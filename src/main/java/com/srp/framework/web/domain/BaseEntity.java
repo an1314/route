@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Entity基类
@@ -40,11 +41,11 @@ public class BaseEntity implements Serializable
     private String dataScope;
 
     /** 开始时间 */
-    @JsonIgnore
+    
     private String beginTime;
 
     /** 结束时间 */
-    @JsonIgnore
+    //@JsonIgnore
     private String endTime;
 
     /** 请求参数 */
@@ -120,21 +121,24 @@ public class BaseEntity implements Serializable
         this.dataScope = dataScope;
     }
 
+    @JsonIgnore
     public String getBeginTime()
     {
         return beginTime;
     }
 
+    @JsonProperty
     public void setBeginTime(String beginTime)
     {
         this.beginTime = beginTime;
     }
 
+    @JsonIgnore
     public String getEndTime()
     {
         return endTime;
     }
-
+    @JsonProperty
     public void setEndTime(String endTime)
     {
         this.endTime = endTime;

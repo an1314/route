@@ -14,10 +14,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="GroupId" property="groupid"  />
         <result column="OrgCode" property="orgCode" />
         <result column="Valid" property="valid" />
-        <result column="createBy" property="createuser" />
-        <result column="createTime" property="createtime" />
-        <result column="updateBy" property="lastupdateuser"  />
-        <result column="updateTime" property="lastupdatetime"  />
+        <result column="createuser" property="createBy" />
+        <result column="createtime" property="createTime" />
+        <result column="lastupdateuser" property="updateBy"  />
+        <result column="lastupdatetime" property="updateTime"  />
 	</resultMap>
 	
 	<sql id="selectUsersDictVo">
@@ -35,7 +35,89 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{oc}
         </foreach>
         <if test="name != null and name != ''">
-			AND concat(FirstName, LastName) like concat('%', #{name}, '%')
+			AND concat(IFNUll(FirstName, ''), IFNUll(LastName, '')) like concat('%', #{name}, '%')
 		</if>
     </select>    
+
+    <!-- 查询某组织架构下用户相关信息汇总 -->
+    <select  id="selectUsersInfoSum" parameterType="SfaUsers" resultType="SfaUsersInfoSum">
+        select userInfo.count as sfaNum, routeact.count as loginNum, routeact.count as visitNum from
+           (
+            <!-- 用户总人数 -->
+            select count(1) as count from sfa_users u
+            where
+             u.valid = '1' 
+             AND u.position in ('门店负责人',  '流动理货员')
+             AND u.orgCode in
+             <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+                 #{oc}
+             </foreach>
+            ) userInfo
+            join
+            (
+                <!-- 登录总人数，拜访总人数 -->
+                select count(Distinct usercode) as count from sfa_route_act ra
+                left join
+                MD_Organization mo on ra.orgId = mo.orgId 
+                where
+                ra.valid = '1'
+                and mo.orgCode in 
+                <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+                    #{oc}
+                </foreach>
+                and ra.date between #{beginTime} and #{endTime}
+            ) routeact
+    </select>
+
+    <!-- 查询未登录人员 -->
+    <select id="selectNoLoginUser" parameterType="SfaUsers" resultType="SfaUsersForOrg">
+        select 
+            u.code as userCode, u.firstName as firstUserName, u.lastName as lastUserName, u.tel as tel,
+            m.code as managerCode, m.firstName as managerFirstUserName, m.lastName as managerLastUserName, m.tel as managerTel,
+            concat(
+                IFNULL(md0.orgLevel, ''), ',', 
+                IFNULL(md0.orgType, ''), ',',
+                IFNULL(md0.orgCode, ''), ',',
+                IFNULL(md0.orgNameCn, ''), ',',
+                IFNULL(md1.orgCode, ''), ',',
+                IFNULL(md1.orgNameCn, ''), ',',
+                IFNULL(md2.orgCode, ''), ',',
+                IFNULL(md2.orgNameCn, ''), ',',
+                IFNULL(md3.orgCode, ''), ',',
+                IFNULL(md3.orgNameCn, ''), ',',
+                IFNULL(md4.orgCode, ''), ',',
+                IFNULL(md4.orgNameCn, ''), ',',
+                IFNULL(md5.orgCode, ''), ',',
+                IFNULL(md5.orgNameCn, ''), ','    
+            ) as orgs
+        from 
+        sfa_users u 
+        left join sfa_users m on u.managerCode = m.code 
+        left join MD_Organization md0 on u.orgCode = md0.orgCode and md0.isdeleted = '0'
+        left join MD_Organization md1 on md0.parent = md1.orgId  and md1.isdeleted = '0'
+        left join MD_Organization md2 on md1.parent = md2.orgId  and md2.isdeleted = '0'
+        left join MD_Organization md3 on md2.parent = md3.orgId  and md3.isdeleted = '0'
+        left join MD_Organization md4 on md3.parent = md4.orgId  and md4.isdeleted = '0'
+        left join MD_Organization md5 on md4.parent = md5.orgId  and md5.isdeleted = '0'
+
+        where
+        u.valid = '1'
+        and u.position in ('门店负责人',  '流动理货员')
+        and u.orgCode in 
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        and 
+        <!-- 判断是否登录 -->
+        not exists (
+           select ra.userCode from
+           sfa_route_act ra
+           where
+           ra.valid = '1'
+           and ra.UserCode = u.Code
+           and 
+           ra.date > #{endTime}
+        )
+        
+    </select>
 </mapper> 

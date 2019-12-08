@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.store.mapper.SfaStoreMapper">
+
+	<resultMap type="SfaStoreForConnection" id="SfaStoreForConnectionResult">
+        <id column="storeCode" property="storeCode"  />
+        <result column="storeStatus" property="storeStatus"  />
+        <result column="sfaCode" property="sfaCode"  />
+        <result column="storeName" property="storeName"  />
+        <result column="storeAddress" property="storeAddress"  />
+        <result column="latitude" property="latitude" />
+        <result column="longitude" property="longitude"  />
+        <!-- <association column="{userCode = userCode, storeCode = storeCode}" property="lastVisitTime" javaType="java.util.Date" select="com.srp.project.route.routeact.mapper.SfaRouteActMapper.selectVisitTime"></association> -->
+        <result column="lastVisitTime" property="lastVisitTime" /> 
+	</resultMap>
+
+    <select id="selectStoreList" parameterType="SfaStore" resultType="SfaStoreForOrg">
+        select 
+        s.storeCode storeCode, s.storeStatus storeStatus, s.sfaCode sfaCode, s.storeType as storeType,
+        s.storeName storeName, s.storeAddress storeAddress, s.latitude latitude, 
+        s.longitude longitude, s.orgCode orgCode,
+        concat(
+                IFNULL(md0.orgLevel, ''), ',', 
+                IFNULL(md0.orgType, ''), ',',
+                IFNULL(md0.orgCode, ''), ',',
+                IFNULL(md0.orgNameCn, ''), ',',
+                IFNULL(md1.orgCode, ''), ',',
+                IFNULL(md1.orgNameCn, ''), ',',
+                IFNULL(md2.orgCode, ''), ',',
+                IFNULL(md2.orgNameCn, ''), ',',
+                IFNULL(md3.orgCode, ''), ',',
+                IFNULL(md3.orgNameCn, ''), ',',
+                IFNULL(md4.orgCode, ''), ',',
+                IFNULL(md4.orgNameCn, ''), ',',
+                IFNULL(md5.orgCode, ''), ',',
+                IFNULL(md5.orgNameCn, ''), ','    
+            ) as orgs
+        from 
+        sfa_store s 
+        left join MD_Organization md0 on s.orgCode = md0.orgCode and md0.isdeleted = '0'
+        left join MD_Organization md1 on md0.parent = md1.orgId  and md1.isdeleted = '0'
+        left join MD_Organization md2 on md1.parent = md2.orgId  and md2.isdeleted = '0'
+        left join MD_Organization md3 on md2.parent = md3.orgId  and md3.isdeleted = '0'
+        left join MD_Organization md4 on md3.parent = md4.orgId  and md4.isdeleted = '0'
+        left join MD_Organization md5 on md4.parent = md5.orgId  and md5.isdeleted = '0'
+        where
+         s.orgCode in 
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        <if test= 'storeStatus != null'>
+            and s.storeStatus = #{storeStatus, jdbcType = BIT}
+        </if>
+        <if test= 'storeName != null and storeName != ""'>
+            and (s.storeName like concat('%', #{storeName}, '%') or s.storeCode like concat('%', #{storeName}, '%'))
+        </if>
+        <if test= 'storeTypes != null and storeTypes.size()'> 
+            and s.storeType in
+            <foreach collection="storeTypes" item="st" open="(" close=")" separator=",">
+                #{st}
+            </foreach>
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="SfaStore">
+        insert sfa_store (storeCode, storeStatus, sfaCode, storeName, storeAddress, latitude, longitude, orgCode, createBy, createTime, lastModifiedBy, lastModifiedTime)
+        values (#{storeCode}, #{storeStatus}, #{sfaCode}, #{storeName}, #{storeAddress}, #{latitude}, #{longitude}, #{orgCode}, #{createBy}, now(), #{createBy}, now())
+    </insert>
+    <update id="update" parameterType="SfaStore">
+        update sfa_store
+        set
+        storeStatus = #{storeStatus},
+        sfaCode = #{sfaCode},
+        storeName = #{storeName},
+        storeAddress = #{storeAddress},
+        latitude = #{latitude},
+        longitude = #{longitude},
+        orgCode = #{orgCode},
+        lastModifiedBy = #{updateBy},
+        lastModifiedTime = now()
+        where storeCode = #{storeCode}
+    </update>
+    <update id="delete">
+        update sfa_store
+        set 
+        storeStatus = #{storeStatus},
+        lastModifiedBy = #{updateBy},
+        lastModifiedTime = now()
+        where
+        storeCode in 
+        <foreach collection="storeCodes" item="sc" open="(" close=")" separator=",">
+            #{sc}
+        </foreach>
+    </update>
+</mapper>

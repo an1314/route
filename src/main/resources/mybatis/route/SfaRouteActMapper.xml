@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.routeact.mapper.SfaRouteActMapper">
+
+	<resultMap type="SfaRouteAct" id="SfaRouteActResult">
+        <!-- <id column="ID" property="id"  /> -->
+        <result column="UserCode" property="userCode"  />
+        <result column="LastUserName" property="lastUserName"  />
+        <result column="FirstUserName" property="firstUserName"  />
+        <!-- <result column="StoreCode" property="storeCode"  /> -->
+        <!-- <result column="Date" property="date"  />
+        <result column="VisitType" property="visitType"  />
+        <result column="Valid" property="latitude" />
+        <result column="OrgId" property="groupid"  />
+        <result column="Lon" property="orgCode" />
+        <result column="Lat" property="valid" />
+        <result column="OutStoreTime" property="orgCode" />
+        <result column="InStoreTime" property="valid" />
+        <result column="CreateUser" property="createBy" />
+        <result column="CreateTime" property="createTime" />
+        <result column="LastUpdateUser" property="updateBy"  />
+        <result column="LastUpdateTime" property="updateTime"  /> -->
+        <collection property="stores"  javaType="java.util.List"  resultMap="com.srp.project.route.store.mapper.SfaStoreForConnectionMapper.SfaStoreForConnectionResult" />
+	</resultMap>
+	
+	<!-- <sql id="selectRouteActForUserVo">
+        select u.Code, u.FirstName, u.LastName
+        from sfa_routeacts u
+    </sql> -->
+    
+    <!-- 查询用户拜访信息 -->
+	<select id="selectSfaRouteActForUserList" parameterType="SfaRouteAct" resultType="SfaRouteActForUser">
+        Select 
+        rap.lon as lon, rap.lat as lat,
+        user.code as userCode, user.firstName as firstUserName, user.lastName as lastUserName,
+        manager.code as managerUserCode, manager.firstName as managerFirstUserName, manager.lastName as managerLastUserName 
+        from
+        (Select 
+        ra.* 
+        from sfa_route_act ra
+        left join
+        MD_Organization mo on ra.orgId = mo.orgId 
+        where ra.valid = '1'
+        and mo.orgCode in 
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        and ra.date between #{beginTime} and #{endTime}
+        group by ra.userCode) rap
+        left join 
+        sfa_users  user on rap.userCode = user.code 
+        left join
+        sfa_users manager on user.managerCode = manager.code and manager.valid = '1'
+        where user.Valid = '1'    
+    </select>  
+
+    <!-- 查询用户实际路线 -->
+    <select id="selectSfaRouteActList" parameterType="SfaRouteAct" resultMap="SfaRouteActResult">
+        Select 
+        rap.lon as longitude, rap.lat as latitude,
+        rap.date as lastVisitTime,
+        user.code as userCode, user.firstName as firstUserName, user.lastName as lastUserName,
+        s.storeCode as storeCode, s.storeName as storeName,
+        s.storeAddress as storeAddress, s.storeType as storeType
+        from
+        (Select 
+        ra.* 
+        from sfa_route_act ra
+        left join
+        MD_Organization mo on ra.orgId = mo.orgId 
+        where ra.valid = '1'
+        and mo.orgCode in 
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        and ra.date between #{beginTime} and #{endTime}
+        <if test='userCodes != null and userCodes.size() != 0' >
+            and ra.userCode in  
+            <foreach collection="userCodes" item="uc" open="(" close=")" separator=",">
+                #{uc}
+            </foreach> 
+        </if>
+        ) rap
+        left join 
+        sfa_users  user on rap.userCode = user.code
+        left join
+        sfa_store s on rap.storeCode = s.storeCode
+        where user.Valid = '1' and s.storeStatus = '1'
+        order by rap.date asc
+        
+    </select>
+    <!-- 获取某一用户下门店最后拜访时间 -->
+    <select id="selectVisitTime" parameterType="java.util.HashMap" resultType="java.util.Date">
+        Select max(date) as lastVisitTime from 
+        sfa_route_act ra where
+        ra.valid = '1'
+        <if test="userCode != null and userCode != ''">
+            and ra.userCode = #{userCode}
+        </if>
+        and ra.storeCode = #{storeCode}
+    </select>
+</mapper> 

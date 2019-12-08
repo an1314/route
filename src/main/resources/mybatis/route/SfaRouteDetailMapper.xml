@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.srp.project.route.routedetail.mapper.SfaRouteDetailMapper">
+
+	<resultMap type="SfaRouteDetail" id="SfaRouteDetailResult">
+        <!-- <id column="ID" property="id"  /> -->
+        <result column="UserCode" property="userCode"  />
+        <result column="LastUserName" property="lastUserName"  />
+        <result column="FirstUserName" property="firstUserName"  />
+        <!-- <result column="StoreCode" property="storeCode"  /> -->
+        <!-- <result column="Date" property="date"  />
+        <result column="VisitType" property="visitType"  />
+        <result column="Valid" property="latitude" />
+        <result column="OrgId" property="groupid"  />
+        <result column="Lon" property="orgCode" />
+        <result column="Lat" property="valid" />
+        <result column="OutStoreTime" property="orgCode" />
+        <result column="InStoreTime" property="valid" />
+        <result column="CreateUser" property="createBy" />
+        <result column="CreateTime" property="createTime" />
+        <result column="LastUpdateUser" property="updateBy"  />
+        <result column="LastUpdateTime" property="updateTime"  /> -->
+        <collection property="stores"  javaType="java.util.List"  resultMap="com.srp.project.route.store.mapper.SfaStoreMapper.SfaStoreForConnectionResult" />
+	</resultMap>
+	
+	<!-- <sql id="selectRouteActForUserVo">
+        select u.Code, u.FirstName, u.LastName
+        from sfa_routeacts u
+    </sql> -->
+    
+
+    <!-- 查询用户实际路线 -->
+    <select id="selectSfaRouteDetailList" parameterType="SfaRouteDetail" resultMap="SfaRouteDetailResult">
+        Select 
+        s.longitude as longitude, s.latitude as latitude,
+        rdp.date as lastVisitTime,
+        user.code as userCode, user.firstName as firstUserName, user.lastName as lastUserName,
+        s.storeCode as storeCode, s.storeName as storeName,
+        s.storeAddress as storeAddress, s.storeType as storeType
+        from
+        (Select 
+        rd.* 
+        from sfa_route_detail rd
+        where rd.valid = '1'
+        and rd.date between #{beginTime} and #{endTime}
+        <if test='userCodes != null and userCodes.size() != 0' >
+            and rd.userCode in  
+            <foreach collection="userCodes" item="uc" open="(" close=")" separator=",">
+                #{uc}
+            </foreach> 
+        </if>
+        ) rdp
+        left join 
+        sfa_users  user on rdp.userCode = user.code
+        left join
+        sfa_store s on rdp.storeCode = s.storeCode      
+        where user.Valid = '1' 
+        and s.storeStatus = '1'
+        and s.orgCode in 
+        <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
+            #{oc}
+        </foreach>
+        order by rdp.sequence asc
+        
+    </select>
+
+</mapper> 
