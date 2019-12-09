@@ -83,6 +83,7 @@ public class SfaStoreController extends BaseController {
     @PutMapping("/update")
     public AjaxResult update(@RequestBody SfaStore sfaStore){
         sfaStore.setUpdateBy(SecurityUtils.getUsername());
+        // 1
         return AjaxResult.success(sfaStoreService.update(sfaStore));
     }
 
