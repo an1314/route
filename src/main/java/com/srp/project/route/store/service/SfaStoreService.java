@@ -29,7 +29,7 @@ public interface SfaStoreService {
      * @param sfaStore
      * @return
      */
-    public Integer update(SfaStore sfaStore);
+    public Integer update(List<SfaStore> sfaStores);
 
 
     /**
