@@ -81,9 +81,8 @@ public class SfaStoreController extends BaseController {
      * @return
      */
     @PutMapping("/update")
-    public AjaxResult update(@RequestBody SfaStore sfaStore){
-        sfaStore.setUpdateBy(SecurityUtils.getUsername());
-        return AjaxResult.success(sfaStoreService.update(sfaStore));
+    public AjaxResult update(@RequestBody List<SfaStore> sfaStores){
+        return AjaxResult.success(sfaStoreService.update(sfaStores));
     }
 
     // 删除门店信息

@@ -50,6 +50,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
             #{oc}
         </foreach>
+        <if test= 'params != null'>
+            <choose>
+                <when test= 'params.gps == "1"'>
+                    and s.longitude != 0 and s.latitude != 0 
+                </when>
+                <when test= 'params.gps == "0"'>
+                    and (s.longitude = 0 or s.latitude = 0) 
+                </when>
+                <otherwise>
+                </otherwise>
+            </choose>
+        </if>
         <if test= 'storeStatus != null'>
             and s.storeStatus = #{storeStatus, jdbcType = BIT}
         </if>
@@ -71,7 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="update" parameterType="SfaStore">
         update sfa_store
         set
-        storeStatus = #{storeStatus},
+        storeStatus = #{storeStatus, jdbcType = BIT},
         sfaCode = #{sfaCode},
         storeName = #{storeName},
         storeAddress = #{storeAddress},
@@ -85,7 +97,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="delete">
         update sfa_store
         set 
-        storeStatus = #{storeStatus},
+        storeStatus = #{storeStatus, jdbcType = BIT},
         lastModifiedBy = #{updateBy},
         lastModifiedTime = now()
         where

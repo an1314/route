@@ -107,6 +107,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <foreach collection="orgCodes" item="oc" open="(" close=")" separator=",">
             #{oc}
         </foreach>
+        <if test="name != null and name != ''">
+			AND concat(IFNUll(u.firstName, ''), IFNUll(u.lastName, '')) like concat('%', #{name}, '%')
+		</if>
         and 
         <!-- 判断是否登录 -->
         not exists (

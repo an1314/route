@@ -9,6 +9,7 @@ import com.srp.project.route.store.service.SfaStoreService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.srp.common.utils.SecurityUtils;
 
 /**
  * SfaStoreServiceImpl
@@ -46,8 +47,13 @@ public class SfaStoreServiceImpl implements SfaStoreService {
      * @return
      */
     @Override
-    public Integer update(SfaStore sfaStore){
-        return sfaStoreMapper.update(sfaStore);
+    public Integer update(List<SfaStore> sfaStores){
+        Integer count = 0;
+        for (SfaStore sfaStore : sfaStores) {
+            sfaStore.setUpdateBy(SecurityUtils.getUsername());
+            count += sfaStoreMapper.update(sfaStore);
+        }
+        return count;
     }
 
 
