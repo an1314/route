@@ -81,6 +81,7 @@ public class SfaStoreController extends BaseController {
      * @return
      */
     @PutMapping("/update")
+
     public AjaxResult update(@RequestBody List<SfaStore> sfaStores){
         return AjaxResult.success(sfaStoreService.update(sfaStores));
     }
