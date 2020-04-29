@@ -53,7 +53,10 @@ public class Room {
         log.info("用户连接:"+userId+",当前在线人数为:" + getOnlineCount());
 
         try {
-            sendMessage("连接成功");
+            JSONObject json = new JSONObject();
+            json.put("message", "连接成功");
+            json.put("fromUserId", "主机");
+            sendMessage(json.toJSONString());
         } catch (IOException e) {
             log.error("用户:"+userId+",网络异常!!!!!!");
         }
